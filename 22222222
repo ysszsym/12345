@@ -23,6 +23,55 @@ void insert(struct L *h,char *m,char *n){
     p->next=q;
 }
 
+void delete(struct L *h,char *m){
+    struct L *p=h;
+    while(p->next!=NULL){
+        if(strcmp(p->next->m,m)==0){
+            struct L *q=p->next;
+            p->next=q->next;
+            free(q);
+            break;
+        }
+        p=p->next;
+    }
+}
+
+void reverse(struct L *h){
+    struct L *p=h->next,*q=NULL,*r=NULL;
+    while(p!=NULL){
+        r=p->next;
+        p->next=q;
+        q=p;
+        p=r;
+    }
+    h->next=q;
+}
+
+void merge(struct L *h1,struct L *h2){
+    struct L *p=h1->next,*q=h2->next,*r=h1;
+    while(p!=NULL && q!=NULL){
+        if(strcmp(p->m,q->m)<0){
+            r->next=p;
+            r=p;
+            p=p->next;
+        }
+        else{
+            r->next=q;
+            r=q;
+            q=q->next;
+        }
+    }
+    if(p!=NULL) r->next=p;
+    if(q!=NULL) r->next=q;
+}
+
+
+
+
+
+
+
+
 void print(struct L *h){
     struct L *p=h->next;
     while(p!=NULL){
@@ -30,6 +79,7 @@ void print(struct L *h){
         p=p->next;
     }
 }
+
 
 int main(){
     struct L *head=list();
@@ -43,7 +93,7 @@ int main(){
         insert(head,m,n);
     }
     while(1){
-        printf("功能选择(1.尾插 2.按学号删除 3.原地逆置 4.合并 5.销毁并退出):");
+        printf("功能选择(1.尾插 2.按学号删除 3.原地逆置 4.有序合并 5.销毁并退出):");
         int a;
         scanf("%d",&a);
         if(a==1){
@@ -59,43 +109,24 @@ int main(){
         else if(a==2){
             printf("输入要删除的学号:");
             scanf("%s",m);
-            struct L *p=head;
-            while(p->next!=NULL){
-                if(strcmp(p->next->m,m)==0){
-                    struct L *q=p->next;
-                    p->next=q->next;
-                    free(q);
-                    break;
-                }
-                p=p->next;
-            }
-            print(head);    
+            delete(head,m);
+            print(head);
         }
         else if(a==3){
-            struct L *p=head->next,*q=NULL,*r=NULL;
-            while(p!=NULL){
-                r=p->next;
-                p->next=q;
-                q=p;
-                p=r;
-            }
-            head->next=q;
+            reverse(head);           
             print(head);   
         }
         else if(a==4){
-            struct L *h2=list();
             printf("输入要合并的链表(学号 姓名,回车结束):");
-            while(fgets(s,sizeof(s),stdin)!=NULL){
-                if(s[0]=='\n') 
+            char s2[100];
+            struct L *head2=list();
+            while(fgets(s2,sizeof(s2),stdin)!=NULL){
+                if(s2[0]=='\n') 
                     break;
-                sscanf(s,"%s %s",m,n);
-                insert(h2,m,n);
+                sscanf(s2,"%s %s",m,n);
+                insert(head2,m,n);
             }
-            struct L *p=head,*q=h2->next;
-            while(p->next!=NULL){
-                p=p->next;
-            }
-            p->next=q;
+            merge(head,head2);
             print(head);
         }
         else if(a==5){
